@@ -38,10 +38,11 @@ fullscreen = 0
 #   MANAGE_EXTERNAL_STORAGE    - 安卓 11+ 访问 /storage/emulated/0/widgetone/...
 android.permissions = READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE,MANAGE_EXTERNAL_STORAGE
 
-# API 组合为官方推荐：target 33 / min 24 / NDK 28c
+# API 组合：target 33 / min 24
+# NDK 用 25b：p4a 对 28c 会提示"尚未完全验证"，25b 是长期稳定版本且体积更小
 android.api = 33
 android.minapi = 24
-android.ndk = 28c
+android.ndk = 25b
 android.accept_sdk_license = True
 
 # Android 10 兼容：以旧版存储模式运行（requestLegacyExternalStorage）

@@ -50,6 +50,25 @@ jobs:
           path: buildozer.log
           if-no-files-found: warn
 
+      # 失败时把关键错误行写进 Job Summary，无需下载日志即可直接查看
+      - name: Dump error summary
+        if: failure()
+        run: |
+          {
+            echo '## ❌ Buildozer 失败原因'
+            echo
+            echo '### 关键错误行（error / Traceback / Exception / failed）'
+            echo '```'
+            grep -nEi 'error:|errors:|traceback|exception|failed|fatal|No space left|Killed|gcc:|ld:' \
+              buildozer.log 2>/dev/null | tail -n 60 || echo '(未匹配到关键字)'
+            echo '```'
+            echo
+            echo '### 日志最后 150 行'
+            echo '```'
+            tail -n 150 buildozer.log 2>/dev/null || echo '(无日志)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload APK artifact
         if: success()
         uses: actions/upload-artifact@v4
