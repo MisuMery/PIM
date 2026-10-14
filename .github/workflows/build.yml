@@ -10,6 +10,8 @@ jobs:
     name: Build APK
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -68,6 +70,27 @@ jobs:
             tail -n 150 buildozer.log 2>/dev/null || echo '(无日志)'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # 失败时把错误摘要推送到 ci-logs 分支（不触发 main 构建），
+      # 便于通过 raw.githubusercontent.com 匿名读取定位问题
+      - name: Publish error digest to ci-logs branch
+        if: failure()
+        run: |
+          {
+            echo "=== run #$GITHUB_RUN_NUMBER ==="
+            echo "=== key errors ==="
+            grep -nEi 'error|traceback|exception|failed|fatal|No space left|Killed|Command failed' \
+              buildozer.log 2>/dev/null | tail -n 120 || echo '(no match)'
+            echo
+            echo "=== last 300 lines ==="
+            tail -n 300 buildozer.log 2>/dev/null || echo '(no log)'
+          } > error-digest.txt
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@users.noreply.github.com"
+          git checkout -B ci-logs
+          git add -f error-digest.txt
+          git commit -m "ci: error digest for run $GITHUB_RUN_NUMBER" || exit 0
+          git push -f origin ci-logs || echo "push failed"
 
       - name: Upload APK artifact
         if: success()

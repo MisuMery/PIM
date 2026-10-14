@@ -16,8 +16,9 @@ source.include_exts = py,png,ttf,ttc
 version = 1.0.0
 android.numeric_version = 1
 
-# 依赖：python3 + kivy（版本由 p4a recipe 决定，当前为 Kivy 2.3.1）
-requirements = python3,kivy==2.3.1
+# 依赖：python3 + kivy
+# 不锁版本，使用 p4a recipe 自带的验证版本，避免 patch/版本错配导致编译失败
+requirements = python3,kivy
 
 # 图标 / 启动图
 icon.filename = %(source.dir)s/assets/icon.png
