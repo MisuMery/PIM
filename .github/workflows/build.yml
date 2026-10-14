@@ -9,23 +9,34 @@ on:
 
 jobs:
   build:
-    name: Build with Buildozer
+    name: Build with Buildozer (official docker)
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build APK (debug, 已自签名可直接安装)
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          workdir: .
-          buildozer_version: stable
+      # 先尝试 docker hub 的 kivy/buildozer:latest，失败则用 ghcr.io 的镜像
+      - name: Determine image
+        id: img
+        run: |
+          if docker pull kivy/buildozer:latest; then
+            echo "image=kivy/buildozer:latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "image=ghcr.io/kivy/buildozer:latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build APK (debug)
+        run: |
+          docker run --rm \
+            --volume "$GITHUB_WORKSPACE:/home/user/hostcwd" \
+            "${{ steps.img.outputs.image }}" \
+            android debug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: inspection-helper-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
           if-no-files-found: error
