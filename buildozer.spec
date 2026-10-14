@@ -17,8 +17,18 @@ version = 1.0.0
 android.numeric_version = 1
 
 # 依赖：python3 + kivy
-# 不锁版本，使用 p4a recipe 自带的验证版本，避免 patch/版本错配导致编译失败
-requirements = python3,kivy
+# kivy recipe 会拉取 requests 等传递依赖，最新版（如 charset-normalizer 3.5.2）
+# 只提供 cp314 wheel，与 p4a 构建环境不匹配会导致：
+#   "ERROR: ...whl is not a supported wheel on this platform"
+# 因此把这些纯 Python 依赖锁定到稳定的 2024 年版本。
+requirements = python3,kivy,\
+    charset-normalizer==3.3.2,\
+    certifi==2024.7.4,\
+    chardet==5.2.0,\
+    idna==3.7,\
+    requests==2.32.3,\
+    urllib3==2.2.1,\
+    filetype==1.2.0
 
 # 图标 / 启动图
 icon.filename = %(source.dir)s/assets/icon.png
