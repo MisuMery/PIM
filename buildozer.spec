@@ -24,7 +24,7 @@ icon.filename = %(source.dir)s/assets/icon.png
 icon.adaptive_foreground.filename = %(source.dir)s/assets/icon_fg.png
 icon.adaptive_background.filename = %(source.dir)s/assets/icon_bg.png
 presplash.filename = %(source.dir)s/assets/presplash.png
-presplash_color = #081C3E
+android.presplash_color = #081C3E
 
 # 竖屏
 orientation = portrait
@@ -45,16 +45,15 @@ android.ndk = 28c
 android.accept_sdk_license = True
 
 # Android 10 兼容：以旧版存储模式运行（requestLegacyExternalStorage）
-android.extra_manifest_application_arguments = extra_manifest_application_arguments.xml
+android.extra_manifest_application_arguments = %(source.dir)s/extra_manifest_application_arguments.xml
 
-# 同时编译这两种 ABI，覆盖几乎所有安卓手机
-android.archs = arm64-v8a,armeabi-v7a
+# 只编译 arm64-v8a（2019 年后安卓机全支持）
+# 双架构会让 CI 磁盘/内存翻倍，容易构建失败；如需兼容 32 位老设备，
+# 改成：android.archs = arm64-v8a,armeabi-v7a
+android.archs = arm64-v8a
 
 # 备份策略：巡检数据在外部存储，应用数据无需云备份
 android.allow_backup = False
-
-# 不启用 OTA 更新等高级功能
-#:buildozer - skip comments
 
 #
 # iOS 段忽略（本工程仅安卓）
